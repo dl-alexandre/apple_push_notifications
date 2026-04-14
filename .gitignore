@@ -1,0 +1,32 @@
+# Environment configuration files
+.env
+.env.local
+.env.*.local
+*.p8
+
+# Erlang/Elixir artifacts
+/_build/
+/cover/
+/deps/
+/doc/
+*.tar
+/.fetch
+erl_crash.dump
+*.ez
+*.beam
+/config/*.secret.exs
+.elixir_ls/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test artifacts
+/tmp/
+/priv/plts/
