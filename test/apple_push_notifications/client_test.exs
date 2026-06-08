@@ -21,7 +21,13 @@ defmodule ApplePushNotifications.ClientTest do
         bundle_id: "com.example.test",
         private_key: private_key,
         base_url: "http://localhost:#{bypass.port}",
-        sandbox: true
+        sandbox: true,
+        req_options: [
+          connect_options: [
+            protocols: [:http1],
+            timeout: 30_000
+          ]
+        ]
       ]
     )
 
