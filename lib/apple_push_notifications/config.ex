@@ -14,8 +14,7 @@ defmodule ApplePushNotifications.Config do
     :base_url,
     :sandbox,
     :token_ttl_seconds,
-    :req_options,
-    :pool_size
+    :req_options
   ]
 
   @type t :: %__MODULE__{
@@ -27,8 +26,7 @@ defmodule ApplePushNotifications.Config do
           base_url: String.t(),
           sandbox: boolean(),
           token_ttl_seconds: pos_integer(),
-          req_options: keyword(),
-          pool_size: pos_integer()
+          req_options: keyword()
         }
 
   @doc """
@@ -56,8 +54,7 @@ defmodule ApplePushNotifications.Config do
         ),
       sandbox: sandbox,
       token_ttl_seconds: Keyword.get(merged, :token_ttl_seconds, @default_ttl),
-      req_options: Keyword.get(merged, :req_options, []),
-      pool_size: Keyword.get(merged, :pool_size, 10)
+      req_options: Keyword.get(merged, :req_options, [])
     }
   end
 

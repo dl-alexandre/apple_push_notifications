@@ -8,7 +8,6 @@ defmodule ApplePushNotifications do
 
   - HTTP/2 connection support (required by APNs)
   - JWT-based authentication with P8 keys
-  - Connection pooling for high-throughput scenarios
   - Automatic token caching with expiration buffer
   - Rich notification support (images, actions, custom UI)
   - VoIP push support
@@ -50,7 +49,6 @@ defmodule ApplePushNotifications do
 
   Optional configuration:
   - `base_url`: Override the APNs endpoint (default: api.push.apple.com or api.sandbox.push.apple.com)
-  - `pool_size`: Connection pool size (default: 10)
   - `token_ttl_seconds`: JWT expiration time (default: 1200 seconds / 20 minutes)
 
   ## Per-Call Options
@@ -336,53 +334,35 @@ defmodule ApplePushNotifications do
 
   # Private helper to build the notification payload
   defp build_notification(opts) do
-    aps = %{}
-
-    # Handle alert (string or map)
     aps =
-      case Keyword.get(opts, :alert) do
-        nil -> aps
-        alert when is_binary(alert) -> Map.put(aps, :alert, alert)
-        alert when is_map(alert) -> Map.put(aps, :alert, alert)
-      end
+      %{}
+      |> put_alert(Keyword.get(opts, :alert))
+      |> put_aps_field(:badge, Keyword.get(opts, :badge))
+      |> put_aps_field(:sound, Keyword.get(opts, :sound))
+      |> put_interruption_level(Keyword.get(opts, :interruption_level))
+      |> put_aps_field(:"relevance-score", Keyword.get(opts, :relevance_score))
 
-    # Handle badge
-    aps =
-      case Keyword.get(opts, :badge) do
-        nil -> aps
-        badge -> Map.put(aps, :badge, badge)
-      end
-
-    # Handle sound
-    aps =
-      case Keyword.get(opts, :sound) do
-        nil -> aps
-        sound -> Map.put(aps, :sound, sound)
-      end
-
-    # Handle interruption level (iOS 15+)
-    aps =
-      case Keyword.get(opts, :interruption_level) do
-        nil -> aps
-        level -> Map.put(aps, :"interruption-level", interruption_level_string(level))
-      end
-
-    # Handle relevance score (iOS 15+)
-    aps =
-      case Keyword.get(opts, :relevance_score) do
-        nil -> aps
-        score -> Map.put(aps, :"relevance-score", score)
-      end
-
-    # Build the full notification
-    notification = %{aps: aps}
-
-    # Merge custom payload
-    case Keyword.get(opts, :custom) do
-      nil -> notification
-      custom -> Map.merge(notification, custom)
-    end
+    # Merge custom payload into the full notification
+    merge_custom(%{aps: aps}, Keyword.get(opts, :custom))
   end
+
+  # Handle alert (string or map)
+  defp put_alert(aps, nil), do: aps
+
+  defp put_alert(aps, alert) when is_binary(alert) or is_map(alert),
+    do: Map.put(aps, :alert, alert)
+
+  defp put_aps_field(aps, _key, nil), do: aps
+  defp put_aps_field(aps, key, value), do: Map.put(aps, key, value)
+
+  # Handle interruption level (iOS 15+)
+  defp put_interruption_level(aps, nil), do: aps
+
+  defp put_interruption_level(aps, level),
+    do: Map.put(aps, :"interruption-level", interruption_level_string(level))
+
+  defp merge_custom(notification, nil), do: notification
+  defp merge_custom(notification, custom), do: Map.merge(notification, custom)
 
   defp interruption_level_string(:passive), do: "passive"
   defp interruption_level_string(:active), do: "active"

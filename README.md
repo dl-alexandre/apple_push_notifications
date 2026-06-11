@@ -19,7 +19,7 @@ Add to your `mix.exs`:
 ```elixir
 defp deps do
   [
-    {:apple_push_notifications, "~> 0.1.0"}
+    {:apple_push_notifications, "~> 0.3.0"}
   ]
 end
 ```

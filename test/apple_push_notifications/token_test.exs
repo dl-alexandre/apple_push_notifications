@@ -70,6 +70,13 @@ defmodule ApplePushNotifications.TokenTest do
 
       assert {:error, {:missing_config, _}} = Token.generate_jwt(opts)
     end
+
+    test "returns an error tuple for malformed PEM", %{opts: opts} do
+      assert {:error, {:token_generation_failed, message}} =
+               Token.generate_jwt(Keyword.put(opts, :private_key, "not a pem"))
+
+      assert is_binary(message)
+    end
   end
 
   describe "access_token/1" do

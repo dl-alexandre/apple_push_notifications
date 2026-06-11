@@ -6,8 +6,7 @@ defmodule ApplePushNotifications.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {ApplePushNotifications.TokenCache, []},
-      {ApplePushNotifications.ConnectionPool, []}
+      {ApplePushNotifications.TokenCache, []}
     ]
 
     Supervisor.start_link(children,
